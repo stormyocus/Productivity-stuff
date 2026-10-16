@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e0a13">
+<title>Grimoire, a witch's reminders</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0e0a13;--crypt:#1a1322;--crypt2:#241a2e;--bone:#e9e2d0;--ash:#a094ab;
+  --wine:#8c2346;--wine-hi:#e0607f;--candle:#e0a84a;--moss:#7aa673;
+  color-scheme:dark;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;min-height:100vh;color:var(--bone);background:var(--void);
+  background-image:radial-gradient(ellipse at 50% -10%,#2b1838 0%,transparent 60%),radial-gradient(ellipse at 50% 120%,#2a0f1c 0%,transparent 55%);
+  background-attachment:fixed;
+  font-family:'IM Fell English',Georgia,'Times New Roman',serif;font-size:18px;line-height:1.5;
+}
+main{max-width:480px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+#moon{flex:none;filter:drop-shadow(0 0 10px rgba(239,230,200,.35))}
+h1{font-family:'UnifrakturCook','IM Fell English',Georgia,serif;font-weight:700;font-size:46px;line-height:1;margin:0;color:var(--bone);letter-spacing:.5px}
+.sub{margin:4px 0 0;color:var(--ash);font-style:italic;font-size:16px}
+.panel{border:4px double var(--wine);background:var(--crypt);padding:16px;margin-bottom:22px;border-radius:2px}
+h2{font-size:21px;font-weight:400;margin:0 0 12px;color:var(--candle);font-style:italic}
+label{display:block;font-size:16px;color:var(--ash);margin:10px 0 4px}
+input,textarea{
+  width:100%;font:inherit;font-size:17px;color:var(--bone);background:var(--void);
+  border:1px solid #4a3a58;border-radius:2px;padding:10px 12px;min-height:46px;
+}
+textarea{resize:vertical;min-height:72px}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--candle);outline-offset:2px}
+input[type=datetime-local]{color-scheme:dark}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;cursor:pointer;color:var(--bone);background:transparent;border:1px solid #5a4868;border-radius:2px;min-height:44px;padding:8px 14px}
+button:active{transform:translateY(1px)}
+.primary{background:var(--wine);border-color:var(--wine-hi);flex:1;font-size:19px}
+.chip{font-size:15px;min-height:40px;padding:6px 12px;color:var(--ash)}
+#msg{min-height:22px;margin:8px 0 0;color:var(--wine-hi);font-size:16px;font-style:italic}
+.tabs{display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid #3a2c48}
+.tab{flex:1;border:0;border-bottom:3px solid transparent;color:var(--ash);font-size:19px;border-radius:0}
+.tab[aria-selected=true]{color:var(--bone);border-bottom-color:var(--candle)}
+ul{list-style:none;margin:0;padding:0}
+.entry{display:flex;align-items:flex-start;gap:12px;background:var(--crypt);border-left:4px solid var(--wine);padding:12px 8px 12px 12px;margin-bottom:10px}
+.entry.over{border-left-color:var(--wine-hi);background:#26121d}
+.entry.done{border-left-color:var(--moss);opacity:.72}
+.entry.done .txt{text-decoration:line-through;text-decoration-color:var(--ash)}
+.tick{flex:none;width:44px;height:44px;border-radius:50%;padding:0;font-size:20px;color:transparent;border:1.5px solid var(--candle)}
+.entry.done .tick{color:var(--moss);border-color:var(--moss)}
+.body{flex:1;min-width:0}
+.txt{margin:0;overflow-wrap:anywhere}
+.when{margin:2px 0 0;font-size:15px;color:var(--ash);font-style:italic}
+.over .when{color:var(--wine-hi)}
+.del{flex:none;width:44px;height:44px;padding:0;border:0;color:var(--ash);font-size:18px}
+.empty{color:var(--ash);font-style:italic;text-align:center;padding:24px 8px}
+.foot{color:var(--ash);font-size:15px;font-style:italic;text-align:center;margin-top:28px}
+#veil{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:rgba(8,4,12,.88);padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+#veil.on{display:flex;animation:fade .35s ease-out}
+.omen{max-width:380px;width:100%;border:4px double var(--candle);background:var(--crypt);padding:24px 20px;text-align:center;box-shadow:0 0 40px rgba(224,168,74,.25)}
+.omen h2{font-family:'UnifrakturCook','IM Fell English',Georgia,serif;font-size:32px;font-style:normal;margin-bottom:8px}
+.omen p{font-size:21px;margin:0 0 20px;overflow-wrap:anywhere}
+.omen .row{justify-content:center}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#veil.on{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <svg id="moon" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"></svg>
+    <div>
+      <h1>Grimoire</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+  </header>
+
+  <section class="panel" aria-labelledby="addh">
+    <h2 id="addh">Inscribe a reminder</h2>
+    <label for="text">What must not be forgotten?</label>
+    <textarea id="text" maxlength="200" placeholder="Water the mandrake, feed the cat, call mother"></textarea>
+    <label for="when">When should it call to you?</label>
+    <input type="datetime-local" id="when">
+    <div class="row">
+      <button class="chip" data-add="1h">In an hour</button>
+      <button class="chip" data-add="tonight">Tonight</button>
+      <button class="chip" data-add="tomorrow">Tomorrow</button>
+    </div>
+    <div class="row"><button class="primary" id="inscribe">Inscribe</button></div>
+    <p id="msg" role="status" aria-live="polite"></p>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-pending" aria-selected="true">Pending</button>
+    <button class="tab" role="tab" id="t-done" aria-selected="false">Done</button>
+  </div>
+  <ul id="list"></ul>
+
+  <p class="foot" id="foot"></p>
+</main>
+
+<div id="veil" role="alertdialog" aria-modal="true" aria-labelledby="oh">
+  <div class="omen">
+    <h2 id="oh">The hour is upon you</h2>
+    <p id="otext"></p>
+    <div class="row">
+      <button class="primary" id="odone">Mark done</button>
+      <button id="osnooze">Snooze 10 minutes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY='grimoire.v1', items=[], tab='pending', current=null, ctx=null;
+  try{ items=JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ items=[]; }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(items)); }catch(e){} }
+  var $=function(id){return document.getElementById(id)};
+  function esc(s){return s.replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function pad(n){return String(n).padStart(2,'0')}
+  function toInput(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+
+  /* Moon */
+  function moonFrac(){
+    var syn=29.530588853, ref=Date.UTC(2000,0,6,18,14);
+    var f=(((Date.now()-ref)/86400000)/syn)%1; return f<0?f+1:f;
+  }
+  function moonName(f){
+    if(f<.03||f>.97)return 'New moon'; if(f<.22)return 'Waxing crescent'; if(f<.28)return 'First quarter';
+    if(f<.47)return 'Waxing gibbous'; if(f<.53)return 'Full moon'; if(f<.72)return 'Waning gibbous';
+    if(f<.78)return 'Last quarter'; return 'Waning crescent';
+  }
+  function drawMoon(f){
+    var r=26,c=28,rx=r*Math.abs(Math.cos(2*Math.PI*f)),s1,s2;
+    if(f<.5){s1=1;s2=f<.25?0:1}else{s1=0;s2=f<.75?0:1}
+    var d='M'+c+' '+(c-r)+'A'+r+' '+r+' 0 0 '+s1+' '+c+' '+(c+r)+'A'+rx+' '+r+' 0 0 '+s2+' '+c+' '+(c-r)+'Z';
+    $('moon').innerHTML='<circle cx="28" cy="28" r="26" fill="#241a2e" stroke="#4a3a58"/><path d="'+d+'" fill="#efe6c8"/>';
+  }
+
+  /* Time text */
+  function rel(ms){
+    var a=Math.abs(ms), m=Math.round(a/60000), h=Math.round(a/3600000), d=Math.round(a/86400000), t;
+    if(m<1)t='now'; else if(m<60)t=m+' min'; else if(h<24)t=h+(h===1?' hour':' hours'); else t=d+(d===1?' day':' days');
+    if(t==='now')return 'now'; return ms<0?'overdue by '+t:'in '+t;
+  }
+  function fmt(ts){
+    return new Date(ts).toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  }
+
+  /* Render */
+  function render(){
+    var now=Date.now();
+    var pend=items.filter(function(i){return !i.done}).length;
+    var f=moonFrac(); drawMoon(f);
+    $('sub').textContent=moonName(f)+' moon. '+pend+(pend===1?' reminder':' reminders')+' pending.';
+    $('sub').textContent=$('sub').textContent.replace('moon moon','moon');
+    var show=items.filter(function(i){return tab==='done'?i.done:!i.done})
+      .sort(function(a,b){return tab==='done'?b.due-a.due:a.due-b.due});
+    if(!show.length){
+      $('list').innerHTML='<li class="empty">'+(tab==='done'?'Nothing finished yet.':'The pages are blank. Inscribe your first reminder above.')+'</li>';
+      return;
+    }
+    $('list').innerHTML=show.map(function(i){
+      var over=!i.done&&i.due<now;
+      return '<li class="entry'+(i.done?' done':'')+(over?' over':'')+'">'+
+        '<button class="tick" data-act="toggle" data-id="'+i.id+'" aria-label="'+(i.done?'Mark as pending':'Mark as done')+'">&#10022;</button>'+
+        '<div class="body"><p class="txt">'+esc(i.text)+'</p><p class="when">'+fmt(i.due)+(i.done?'':', '+rel(i.due-now))+'</p></div>'+
+        '<button class="del" data-act="del" data-id="'+i.id+'" aria-label="Delete reminder">&#10005;</button></li>';
+    }).join('');
+  }
+
+  /* Add */
+  function setDefault(){ var d=new Date(Date.now()+3600000); d.setMinutes(0,0,0); $('when').value=toInput(d); }
+  function msg(t){ $('msg').textContent=t||''; }
+  function addItem(){
+    var text=$('text').value.trim(), due=new Date($('when').value).getTime();
+    if(!text){ msg('Write what to remember first.'); $('text').focus(); return; }
+    if(isNaN(due)){ msg('Choose a date and time.'); return; }
+    items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),text:text,due:due,done:false,alerted:due<=Date.now()?false:false});
+    save(); $('text').value=''; setDefault(); msg(''); tab='pending'; tabs(); render();
+    askPermission(); check();
+  }
+  function quick(k){
+    var d=new Date();
+    if(k==='1h'){ d=new Date(Date.now()+3600000); }
+    else if(k==='tonight'){ d.setHours(21,0,0,0); if(d<=new Date()) d=new Date(Date.now()+3600000); }
+    else { d.setDate(d.getDate()+1); d.setHours(9,0,0,0); }
+    $('when').value=toInput(d);
+  }
+
+  /* Alerts */
+  function askPermission(){
+    try{ if('Notification' in window && Notification.permission==='default') Notification.requestPermission(); }catch(e){}
+  }
+  function chime(){
+    try{
+      ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+      [392,523.25,659.25].forEach(function(fq,k){
+        var o=ctx.createOscillator(), g=ctx.createGain(), t=ctx.currentTime+k*.28;
+        o.type='sine'; o.frequency.value=fq; o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.25,t+.03); g.gain.exponentialRampToValueAtTime(.001,t+1.6);
+        o.start(t); o.stop(t+1.7);
+      });
+    }catch(e){}
+  }
+  function ring(i){
+    current=i; i.alerted=true; save();
+    $('otext').textContent=i.text; $('veil').classList.add('on'); $('odone').focus();
+    chime();
+    try{ if(navigator.vibrate) navigator.vibrate([300,150,300,150,600]); }catch(e){}
+    try{ if('Notification' in window && Notification.permission==='granted') new Notification('The hour is upon you',{body:i.text}); }catch(e){}
+  }
+  function check(){
+    render();
+    if(current) return;
+    var now=Date.now();
+    var due=items.filter(function(i){return !i.done&&!i.alerted&&i.due<=now}).sort(function(a,b){return a.due-b.due})[0];
+    if(due) ring(due);
+  }
+  function closeOmen(){ $('veil').classList.remove('on'); current=null; save(); check(); }
+
+  /* Events */
+  function tabs(){
+    $('t-pending').setAttribute('aria-selected',tab==='pending');
+    $('t-done').setAttribute('aria-selected',tab==='done');
+  }
+  $('inscribe').addEventListener('click',addItem);
+  document.querySelectorAll('[data-add]').forEach(function(b){ b.addEventListener('click',function(){quick(b.dataset.add)}); });
+  $('t-pending').addEventListener('click',function(){tab='pending';tabs();render()});
+  $('t-done').addEventListener('click',function(){tab='done';tabs();render()});
+  $('list').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-act]'); if(!b) return;
+    var i=items.find(function(x){return x.id===b.dataset.id}); if(!i) return;
+    if(b.dataset.act==='toggle'){ i.done=!i.done; if(!i.done && i.due<=Date.now()) i.alerted=true; }
+    else { items=items.filter(function(x){return x.id!==i.id}); }
+    save(); render();
+  });
+  $('odone').addEventListener('click',function(){ if(current) current.done=true; closeOmen(); });
+  $('osnooze').addEventListener('click',function(){ if(current){ current.due=Date.now()+600000; current.alerted=false; } closeOmen(); });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) check(); });
+
+  $('foot').textContent='Alerts sound while this page is open. In Chrome, use Add to Home screen to keep it close.';
+  setDefault(); tabs(); check(); setInterval(check,5000);
+})();
+</script>
+</body>
+</html>
